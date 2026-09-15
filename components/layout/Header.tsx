@@ -4,6 +4,7 @@
 
 import { usePathname } from 'next/navigation'
 import { MonthSelector } from './MonthSelector'
+import { NotificationBell } from './NotificationBell'
 
 const pageTitles: Record<string, string> = {
   '/':               'Dashboard',
@@ -52,11 +53,10 @@ export function Header() {
       </h1>
 
       {/* Month selector — shown on relevant pages */}
-      {showMonthSelector && (
-        <div className="flex-shrink-0">
-          <MonthSelector compact />
-        </div>
-      )}
+      <div className="flex-shrink-0 flex items-center gap-2">
+        {showMonthSelector && <MonthSelector compact />}
+        <NotificationBell />
+      </div>
     </header>
   )
 }

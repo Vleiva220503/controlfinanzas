@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, TrendingUp, Lock, User } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
+import { clearQueryCache } from '@/components/providers/QueryProvider'
 import { loginSchema, type LoginFormValues } from '@/lib/finance/validators'
 import { usernameToEmail } from '@/lib/finance/formatters'
 import { cn } from '@/lib/utils'
@@ -38,6 +39,10 @@ export default function LoginPage() {
     }
 
     const supabase = createClient()
+    
+    // Clear React Query cache BEFORE signing in
+    clearQueryCache()
+    
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password: data.password,
@@ -104,13 +109,8 @@ export default function LoginPage() {
             <label htmlFor="username" className="label">
               Usuario
             </label>
-            <div className="relative">
-              <span
-                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                style={{ color: 'var(--foreground-subtle)' }}
-              >
-                <User size={17} />
-              </span>
+            <div className="input-with-icon">
+              <span className="input-icon-left"><User size={17} /></span>
               <input
                 id="username"
                 type="text"
@@ -119,7 +119,7 @@ export default function LoginPage() {
                 autoCorrect="off"
                 spellCheck={false}
                 placeholder="jade o victor"
-                className={cn('input pl-10', errors.username && 'border-negative focus:border-negative')}
+                className={cn('input', errors.username && 'border-negative focus:border-negative')}
                 {...register('username')}
                 style={{
                   borderColor: errors.username ? 'var(--negative)' : undefined,
@@ -136,30 +136,25 @@ export default function LoginPage() {
             <label htmlFor="password" className="label">
               Contraseña
             </label>
-            <div className="relative">
-              <span
-                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                style={{ color: 'var(--foreground-subtle)' }}
-              >
-                <Lock size={17} />
-              </span>
+            <div className="input-with-icon" style={{ position: 'relative' }}>
+              <span className="input-icon-left"><Lock size={17} /></span>
               <input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 placeholder="••••••••"
-                className={cn('input pl-10 pr-11', errors.password && 'border-negative')}
-                {...register('password')}
+                className={cn('input', errors.password && 'border-negative')}
                 style={{
+                  paddingRight: '2.75rem',
                   borderColor: errors.password ? 'var(--negative)' : undefined,
                 }}
+                {...register('password')}
               />
               <button
                 type="button"
                 aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 onClick={() => setShowPassword(v => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded"
-                style={{ color: 'var(--foreground-subtle)', lineHeight: 0 }}
+                style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--foreground-subtle)', lineHeight: 0, background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
               >
                 {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
               </button>

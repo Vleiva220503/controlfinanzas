@@ -3,6 +3,20 @@
 
 import { z } from 'zod'
 
+// ─── Constantes ────────────────────────────────────────────
+export const INCOME_TYPES = [
+  'Salario',
+  'Freelance',
+  'Negocio',
+  'Inversión',
+  'Regalo',
+  'Beca',
+  'Pensión',
+  'Alquiler',
+  'Venta',
+  'Otro',
+] as const
+
 // ─── Cuenta ────────────────────────────────────────────────
 export const accountSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido').max(100),

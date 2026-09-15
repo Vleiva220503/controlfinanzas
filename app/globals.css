@@ -164,7 +164,7 @@ input, textarea, select {
 }
 
 /* ─── Utility Classes ────────────────────────────────────── */
-
+@layer utilities {
 /* Surface classes */
 .surface { background-color: var(--surface); }
 .surface-elevated { background-color: var(--surface-elevated); }
@@ -197,9 +197,10 @@ input, textarea, select {
 .shadow-soft { box-shadow: var(--shadow-sm); }
 .shadow-card { box-shadow: var(--shadow-md); }
 .shadow-modal { box-shadow: var(--shadow-xl); }
+}
 
 /* ─── Component Base Styles ──────────────────────────────── */
-
+@layer components {
 /* Card */
 .card {
   background-color: var(--surface);
@@ -293,6 +294,29 @@ input, textarea, select {
 .input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Input with leading icon — use this wrapper pattern */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon .input-icon-left {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--foreground-subtle);
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+.input-with-icon .input {
+  padding-left: 2.5rem; /* 40px — makes room for 18-20px icon + margins */
 }
 
 /* Label */
@@ -534,4 +558,5 @@ input, textarea, select {
   background-color: rgb(0 0 0 / 0.5);
   z-index: 45;
   animation: fadeIn 0.15s ease;
+}
 }

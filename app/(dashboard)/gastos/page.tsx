@@ -11,8 +11,10 @@ import { MovementTable } from '@/components/movements/MovementTable'
 import { MovementModal } from '@/components/movements/MovementModal'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { TableSkeleton, MovementCardSkeleton } from '@/components/shared/Skeleton'
-import type { Movement, MovementFilters } from '@/types/database'
+import type { Movement, MovementFilters, Category } from '@/types/database'
 import { useDeleteMovement } from '@/hooks/useMovements'
+import { useAccounts } from '@/hooks/useAccounts'
+import { useCategories } from '@/hooks/useCategories'
 import { formatCurrency } from '@/lib/finance/formatters'
 
 export default function GastosPage() {
@@ -26,7 +28,13 @@ export default function GastosPage() {
   }
 
   const { data: movements, isLoading } = useMovements(filters)
+  const { data: accounts = [], isLoading: isLoadingAccounts } = useAccounts()
+  const { data: categories = [], isLoading: isLoadingCategories } = useCategories('gasto')
   const deleteMovement = useDeleteMovement()
+
+  // Calcular totales
+  const totalSpent = movements?.reduce((sum, m) => sum + m.amount, 0) || 0
+
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editingMovement, setEditingMovement] = useState<Movement | null>(null)
@@ -85,17 +93,47 @@ export default function GastosPage() {
         </div>
       </div>
 
-      {/* Barra de Herramientas */}
-      <div className="flex flex-col sm:flex-row gap-3 items-center">
-        <div className="relative flex-1 w-full">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-muted" />
-          <input
-            type="text"
-            placeholder="Buscar por descripción..."
-            value={search}
-            onChange={handleSearch}
-            className="input pl-10 w-full bg-surface"
-          />
+      {/* Resumen de Saldos Disponibles */}
+      {!isLoadingAccounts && accounts.length > 0 && (
+        <div className="flex overflow-x-auto gap-3 pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
+          {accounts.map(acc => (
+            <div key={acc.id} className="card p-3 min-w-[140px] flex-shrink-0 flex flex-col gap-1 snap-start border-l-4 border-l-accent">
+              <span className="text-xs font-medium text-foreground-muted truncate">{acc.name}</span>
+              <span className="text-sm font-bold text-foreground">{formatCurrency(acc.current_balance)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Barra de Herramientas y Filtros */}
+      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto flex-1">
+          <div className="input-with-icon flex-1 w-full max-w-sm">
+            <span className="input-icon-left"><Search size={18} /></span>
+            <input
+              type="text"
+              placeholder="Buscar gasto..."
+              value={search}
+              onChange={handleSearch}
+              className="input w-full bg-surface"
+            />
+          </div>
+          <select 
+            className="input w-full sm:w-48 bg-surface text-sm"
+            value={filters.categoryId || ''}
+            onChange={(e) => setFilters(prev => ({ ...prev, categoryId: e.target.value || undefined }))}
+          >
+            <option value="">Todas las categorías</option>
+            {categories.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+        
+        {/* Total Filtrado */}
+        <div className="card px-4 py-2 flex items-center gap-3 bg-surface-subtle border-none self-end sm:self-auto w-full sm:w-auto justify-between sm:justify-start">
+          <span className="text-sm font-medium text-foreground-muted">Total filtrado:</span>
+          <span className="text-lg font-bold text-negative">{formatCurrency(totalSpent)}</span>
         </div>
       </div>
 

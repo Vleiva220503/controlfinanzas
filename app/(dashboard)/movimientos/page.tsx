@@ -84,14 +84,14 @@ export default function MovimientosPage() {
 
       {/* Barra de Herramientas (Búsqueda + Filtros) */}
       <div className="flex flex-col sm:flex-row gap-3 items-center">
-        <div className="relative flex-1 w-full">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-muted" />
+        <div className="input-with-icon flex-1 w-full">
+          <span className="input-icon-left"><Search size={18} /></span>
           <input
             type="text"
             placeholder="Buscar por descripción o notas..."
             value={search}
             onChange={handleSearch}
-            className="input pl-10 w-full bg-surface"
+            className="input w-full bg-surface"
           />
         </div>
         <button 

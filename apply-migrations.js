@@ -29,7 +29,9 @@ async function run() {
     '001_initial_schema.sql',
     '002_rls_policies.sql',
     '003_indexes.sql',
-    '004_triggers.sql'
+    '004_triggers.sql',
+    '006_notifications.sql',
+    '007_per_user_rls.sql',
   ];
 
   for (const file of migrations) {

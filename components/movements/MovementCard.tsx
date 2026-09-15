@@ -9,8 +9,8 @@ import { useState } from 'react'
 
 interface MovementCardProps {
   movement: Movement
-  onEdit: (m: Movement) => void
-  onDelete: (m: Movement) => void
+  onEdit?: (m: Movement) => void
+  onDelete?: (m: Movement) => void
 }
 
 export function MovementCard({ movement, onEdit, onDelete }: MovementCardProps) {
@@ -73,41 +73,47 @@ export function MovementCard({ movement, onEdit, onDelete }: MovementCardProps) 
       </div>
 
       {/* Menu Button (Absolute top right) */}
-      <div className="absolute top-3 right-2">
-         <button 
-           onClick={() => setMenuOpen(!menuOpen)}
-           className="p-1 rounded text-foreground-subtle hover:bg-surface-elevated transition-colors"
-           aria-label="Opciones"
-         >
-           <MoreVertical size={16} />
-         </button>
+      {(onEdit || onDelete) && (
+        <div className="absolute top-3 right-2">
+           <button 
+             onClick={() => setMenuOpen(!menuOpen)}
+             className="p-1 rounded text-foreground-subtle hover:bg-surface-elevated transition-colors"
+             aria-label="Opciones"
+           >
+             <MoreVertical size={16} />
+           </button>
 
-         {/* Dropdown Simple */}
-         {menuOpen && (
-           <>
-             <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-             <div 
-               className="absolute right-0 top-8 z-50 rounded-lg shadow-modal py-1 w-32 slide-up"
-               style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
-             >
-               <button
-                 onClick={() => { setMenuOpen(false); onEdit(movement); }}
-                 className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-surface-subtle"
-                 style={{ color: 'var(--foreground)' }}
+           {/* Dropdown Simple */}
+           {menuOpen && (
+             <>
+               <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+               <div 
+                 className="absolute right-0 top-8 z-50 rounded-lg shadow-modal py-1 w-32 slide-up"
+                 style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
                >
-                 <Edit2 size={14} /> Editar
-               </button>
-               <button
-                 onClick={() => { setMenuOpen(false); onDelete(movement); }}
-                 className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-negative-light"
-                 style={{ color: 'var(--negative)' }}
-               >
-                 <Trash2 size={14} /> Eliminar
-               </button>
-             </div>
-           </>
-         )}
-      </div>
+                 {onEdit && (
+                   <button
+                     onClick={() => { setMenuOpen(false); onEdit(movement); }}
+                     className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-surface-subtle"
+                     style={{ color: 'var(--foreground)' }}
+                   >
+                     <Edit2 size={14} /> Editar
+                   </button>
+                 )}
+                 {onDelete && (
+                   <button
+                     onClick={() => { setMenuOpen(false); onDelete(movement); }}
+                     className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-negative-light"
+                     style={{ color: 'var(--negative)' }}
+                   >
+                     <Trash2 size={14} /> Eliminar
+                   </button>
+                 )}
+               </div>
+             </>
+           )}
+        </div>
+      )}
     </div>
   )
 }

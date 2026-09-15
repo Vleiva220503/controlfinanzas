@@ -26,6 +26,7 @@ import {
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
+import { clearQueryCache } from '@/components/providers/QueryProvider'
 
 const navItems = [
   { href: '/',               icon: LayoutDashboard, label: 'Dashboard' },
@@ -50,6 +51,9 @@ export function Sidebar() {
 
   async function handleLogout() {
     const supabase = createClient()
+    // Clear React Query cache BEFORE signing out — prevents next user
+    // from seeing stale data cached under the previous session.
+    clearQueryCache()
     await supabase.auth.signOut()
     toast.success('Sesión cerrada')
     router.push('/login')

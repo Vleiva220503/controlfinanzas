@@ -94,73 +94,136 @@ export default function AccountsPage() {
             }
           />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead style={{ background: 'var(--surface-subtle)', borderBottom: '1px solid var(--border)' }}>
-                <tr>
-                  <th className="px-5 py-3 font-medium" style={{ color: 'var(--foreground-muted)' }}>Nombre</th>
-                  <th className="px-5 py-3 font-medium" style={{ color: 'var(--foreground-muted)' }}>Tipo</th>
-                  <th className="px-5 py-3 font-medium text-right" style={{ color: 'var(--foreground-muted)' }}>Saldo Actual</th>
-                  <th className="px-5 py-3 font-medium text-right" style={{ color: 'var(--foreground-muted)' }}>Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {accounts.map(account => (
-                  <tr key={account.id} className="hover:bg-surface-subtle transition-colors group">
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center bg-accent-light text-accent">
-                          <Wallet size={16} />
-                        </div>
-                        <span className="font-semibold" style={{ color: 'var(--foreground)' }}>{account.name}</span>
+          <>
+            {/* Vista Móvil (Tarjetas) */}
+            <div className="mobile-only flex flex-col gap-3">
+              {accounts.map(account => (
+                <div key={account.id} className="card p-4 flex flex-col gap-3 relative">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-accent-light text-accent flex-shrink-0">
+                        <Wallet size={20} />
                       </div>
-                    </td>
-                    <td className="px-5 py-4" style={{ color: 'var(--foreground-muted)' }}>
-                      {account.type}
-                    </td>
-                    <td className="px-5 py-4 text-right font-medium" style={{ color: account.current_balance < 0 ? 'var(--negative)' : 'var(--foreground)' }}>
-                      {formatCurrency(account.current_balance)}
-                    </td>
-                    <td className="px-5 py-4 text-right relative">
-                      <button 
-                        onClick={() => setActiveMenuId(activeMenuId === account.id ? null : account.id)}
-                        className="btn btn-ghost"
-                        style={{ minHeight: '32px', width: '32px', padding: 0 }}
-                      >
-                        <MoreVertical size={16} />
-                      </button>
-
-                      {/* Dropdown Menu Simple */}
-                      {activeMenuId === account.id && (
-                        <>
-                          <div className="fixed inset-0 z-40" onClick={() => setActiveMenuId(null)} />
-                          <div 
-                            className="absolute right-5 top-12 z-50 rounded-lg shadow-modal py-1 min-w-[140px] slide-up"
-                            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+                      <div>
+                        <h3 className="font-semibold text-base" style={{ color: 'var(--foreground)' }}>{account.name}</h3>
+                        <span className="text-xs" style={{ color: 'var(--foreground-muted)' }}>{account.type}</span>
+                      </div>
+                    </div>
+                    
+                    {/* Botón de opciones (Móvil) */}
+                    <button 
+                      onClick={() => setActiveMenuId(activeMenuId === account.id ? null : account.id)}
+                      className="btn btn-ghost"
+                      style={{ minHeight: '32px', width: '32px', padding: 0 }}
+                    >
+                      <MoreVertical size={16} />
+                    </button>
+                    {/* Menú Móvil */}
+                    {activeMenuId === account.id && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setActiveMenuId(null)} />
+                        <div 
+                          className="absolute right-4 top-10 z-50 rounded-lg shadow-modal py-1 min-w-[140px] slide-up"
+                          style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+                        >
+                          <button
+                            onClick={() => handleOpenEdit(account)}
+                            className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-surface-subtle transition-colors"
+                            style={{ color: 'var(--foreground)' }}
                           >
-                            <button
-                              onClick={() => handleOpenEdit(account)}
-                              className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-surface-subtle transition-colors"
-                              style={{ color: 'var(--foreground)' }}
-                            >
-                              <Edit2 size={14} /> Editar
-                            </button>
-                            <button
-                              onClick={() => handleDeleteRequest(account)}
-                              className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-negative-light transition-colors"
-                              style={{ color: 'var(--negative)' }}
-                            >
-                              <Trash2 size={14} /> Eliminar
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </td>
+                            <Edit2 size={14} /> Editar
+                          </button>
+                          <button
+                            onClick={() => handleDeleteRequest(account)}
+                            className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-negative-light transition-colors"
+                            style={{ color: 'var(--negative)' }}
+                          >
+                            <Trash2 size={14} /> Eliminar
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  
+                  <div className="flex justify-between items-end mt-1">
+                    <span className="text-sm font-medium" style={{ color: 'var(--foreground-muted)' }}>Saldo Actual</span>
+                    <span className="text-lg font-bold" style={{ color: account.current_balance < 0 ? 'var(--negative)' : 'var(--foreground)' }}>
+                      {formatCurrency(account.current_balance)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Vista Desktop (Tabla) */}
+            <div className="desktop-only w-full">
+              <table className="w-full text-left text-sm whitespace-nowrap">
+                <thead style={{ background: 'var(--surface-subtle)', borderBottom: '1px solid var(--border)' }}>
+                  <tr>
+                    <th className="px-5 py-3 font-medium" style={{ color: 'var(--foreground-muted)' }}>Nombre</th>
+                    <th className="px-5 py-3 font-medium" style={{ color: 'var(--foreground-muted)' }}>Tipo</th>
+                    <th className="px-5 py-3 font-medium text-right" style={{ color: 'var(--foreground-muted)' }}>Saldo Actual</th>
+                    <th className="px-5 py-3 font-medium text-right" style={{ color: 'var(--foreground-muted)' }}>Acciones</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {accounts.map(account => (
+                    <tr key={account.id} className="hover:bg-surface-subtle transition-colors group">
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center bg-accent-light text-accent">
+                            <Wallet size={16} />
+                          </div>
+                          <span className="font-semibold" style={{ color: 'var(--foreground)' }}>{account.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-4" style={{ color: 'var(--foreground-muted)' }}>
+                        {account.type}
+                      </td>
+                      <td className="px-5 py-4 text-right font-medium" style={{ color: account.current_balance < 0 ? 'var(--negative)' : 'var(--foreground)' }}>
+                        {formatCurrency(account.current_balance)}
+                      </td>
+                      <td className="px-5 py-4 text-right relative">
+                        <button 
+                          onClick={() => setActiveMenuId(activeMenuId === account.id ? null : account.id)}
+                          className="btn btn-ghost"
+                          style={{ minHeight: '32px', width: '32px', padding: 0 }}
+                        >
+                          <MoreVertical size={16} />
+                        </button>
+
+                        {/* Dropdown Menu Simple */}
+                        {activeMenuId === account.id && (
+                          <>
+                            <div className="fixed inset-0 z-40" onClick={() => setActiveMenuId(null)} />
+                            <div 
+                              className="absolute right-5 top-12 z-50 rounded-lg shadow-modal py-1 min-w-[140px] slide-up"
+                              style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+                            >
+                              <button
+                                onClick={() => handleOpenEdit(account)}
+                                className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-surface-subtle transition-colors"
+                                style={{ color: 'var(--foreground)' }}
+                              >
+                                <Edit2 size={14} /> Editar
+                              </button>
+                              <button
+                                onClick={() => handleDeleteRequest(account)}
+                                className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-negative-light transition-colors"
+                                style={{ color: 'var(--negative)' }}
+                              >
+                                <Trash2 size={14} /> Eliminar
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 

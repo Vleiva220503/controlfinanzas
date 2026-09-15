@@ -11,8 +11,8 @@ import { ArrowLeftRight } from 'lucide-react'
 
 interface MovementTableProps {
   movements: Movement[]
-  onEdit: (m: Movement) => void
-  onDelete: (m: Movement) => void
+  onEdit?: (m: Movement) => void
+  onDelete?: (m: Movement) => void
 }
 
 export function MovementTable({ movements, onEdit, onDelete }: MovementTableProps) {
@@ -81,37 +81,43 @@ export function MovementTable({ movements, onEdit, onDelete }: MovementTableProp
                 >
                   {isIncome ? '+' : '-'}{formatCurrency(mov.amount)}
                 </td>
-                <td className="px-4 py-3 text-right relative">
-                  <button 
-                    onClick={() => setActiveMenuId(activeMenuId === mov.id ? null : mov.id)}
-                    className="p-1 rounded text-foreground-subtle hover:text-foreground transition-colors"
-                  >
-                    <MoreVertical size={16} />
-                  </button>
+                {(onEdit || onDelete) && (
+                  <td className="px-4 py-3 text-right relative">
+                    <button 
+                      onClick={() => setActiveMenuId(activeMenuId === mov.id ? null : mov.id)}
+                      className="p-1 rounded text-foreground-subtle hover:text-foreground transition-colors"
+                    >
+                      <MoreVertical size={16} />
+                    </button>
 
-                  {activeMenuId === mov.id && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setActiveMenuId(null)} />
-                      <div 
-                        className="absolute right-8 top-10 z-50 rounded-lg shadow-modal py-1 min-w-[120px] slide-up"
-                        style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
-                      >
-                        <button
-                          onClick={() => { setActiveMenuId(null); onEdit(mov); }}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-surface-subtle transition-colors text-foreground"
+                    {activeMenuId === mov.id && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setActiveMenuId(null)} />
+                        <div 
+                          className="absolute right-8 top-10 z-50 rounded-lg shadow-modal py-1 min-w-[120px] slide-up"
+                          style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
                         >
-                          <Edit2 size={14} /> Editar
-                        </button>
-                        <button
-                          onClick={() => { setActiveMenuId(null); onDelete(mov); }}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-negative-light transition-colors text-negative"
-                        >
-                          <Trash2 size={14} /> Eliminar
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </td>
+                          {onEdit && (
+                            <button
+                              onClick={() => { setActiveMenuId(null); onEdit(mov); }}
+                              className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-surface-subtle transition-colors text-foreground"
+                            >
+                              <Edit2 size={14} /> Editar
+                            </button>
+                          )}
+                          {onDelete && (
+                            <button
+                              onClick={() => { setActiveMenuId(null); onDelete(mov); }}
+                              className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-negative-light transition-colors text-negative"
+                            >
+                              <Trash2 size={14} /> Eliminar
+                            </button>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </td>
+                )}
               </tr>
             )
           })}
