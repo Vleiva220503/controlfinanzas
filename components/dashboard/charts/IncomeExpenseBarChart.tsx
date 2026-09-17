@@ -11,11 +11,11 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts'
-import { formatCurrency, formatMonthShort } from '@/lib/finance/formatters'
+import { formatCurrency } from '@/lib/finance/formatters'
 import { EmptyState } from '@/components/shared/EmptyState'
 
 interface IncomeExpenseBarChartProps {
-  data: { month: string; income: number; expenses: number }[]
+  data: { label: string; income: number; expenses: number }[]
 }
 
 // Tooltip declarado fuera del componente renderizante (fix ESLint react-hooks/static-components)
@@ -35,7 +35,7 @@ function CustomTooltip({ active, payload, label }: any) {
         }}
       >
         <p style={{ fontWeight: 600, color: 'var(--foreground)', marginBottom: '0.5rem', paddingBottom: '0.25rem', borderBottom: '1px solid var(--border)' }}>
-          {formatMonthShort(label as string)}
+          {label}
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -72,8 +72,7 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
         <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
           <XAxis
-            dataKey="month"
-            tickFormatter={formatMonthShort}
+            dataKey="label"
             axisLine={false}
             tickLine={false}
             tick={{ fill: 'var(--foreground-muted)', fontSize: 12 }}
@@ -106,3 +105,4 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
     </div>
   )
 }
+

@@ -150,6 +150,7 @@ export function amountSign(amount: number): 'positive' | 'negative' | 'neutral' 
 export const USER_EMAIL_MAP: Record<string, string> = {
   jade: 'jade@localfinance.app',
   victor: 'victor@localfinance.app',
+  sol: 'sol@localfinance.app',
 }
 
 export function usernameToEmail(username: string): string | null {

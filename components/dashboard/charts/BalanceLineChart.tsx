@@ -12,11 +12,11 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import { formatCurrency, formatMonthShort } from '@/lib/finance/formatters'
+import { formatCurrency } from '@/lib/finance/formatters'
 import { EmptyState } from '@/components/shared/EmptyState'
 
 interface BalanceLineChartProps {
-  data: { month: string; balance: number }[]
+  data: { label: string; balance: number }[]
 }
 
 // Componente de tooltip declarado FUERA del componente renderizante (requerido por ESLint react-hooks/static-components)
@@ -35,7 +35,7 @@ function CustomTooltip({ active, payload, label }: any) {
         }}
       >
         <p style={{ fontWeight: 600, color: 'var(--foreground)', marginBottom: '0.25rem' }}>
-          {formatMonthShort(label as string)}
+          {label}
         </p>
         <p>
           <span style={{ color: 'var(--foreground-muted)', marginRight: '0.5rem' }}>Saldo:</span>
@@ -64,8 +64,7 @@ export function BalanceLineChart({ data }: BalanceLineChartProps) {
         <LineChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
           <XAxis
-            dataKey="month"
-            tickFormatter={formatMonthShort}
+            dataKey="label"
             axisLine={false}
             tickLine={false}
             tick={{ fill: 'var(--foreground-muted)', fontSize: 12 }}
@@ -96,3 +95,4 @@ export function BalanceLineChart({ data }: BalanceLineChartProps) {
     </div>
   )
 }
+

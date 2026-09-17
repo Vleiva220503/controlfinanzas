@@ -33,7 +33,7 @@ export default function LoginPage() {
 
     const email = usernameToEmail(data.username)
     if (!email) {
-      toast.error('Usuario no reconocido. Usa "jade" o "victor".')
+      toast.error('Usuario no reconocido. Usa "jade", "victor".')
       setIsLoading(false)
       return
     }
@@ -95,7 +95,7 @@ export default function LoginPage() {
               Control de Finanzas
             </h1>
             <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>
-              Acceso privado  Jade &amp; victor
+              Acceso privado
             </p>
           </div>
         </div>

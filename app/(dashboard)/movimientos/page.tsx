@@ -3,22 +3,26 @@
 // Página principal de historial de movimientos
 
 import { useState } from 'react'
-import { Plus, SlidersHorizontal, Search } from 'lucide-react'
+import { Plus, SlidersHorizontal, Search, List, Calendar as CalendarIcon } from 'lucide-react'
 import { useMovements } from '@/hooks/useMovements'
 import { useMonth } from '@/components/providers/MonthProvider'
 import { MovementCard } from '@/components/movements/MovementCard'
 import { MovementTable } from '@/components/movements/MovementTable'
 import { MovementModal } from '@/components/movements/MovementModal'
+import { MovementCalendar } from '@/components/movements/MovementCalendar'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { TableSkeleton, MovementCardSkeleton } from '@/components/shared/Skeleton'
 import type { Movement, MovementFilters } from '@/types/database'
 import { useDeleteMovement } from '@/hooks/useMovements'
 import { formatCurrency } from '@/lib/finance/formatters'
 
+type ViewMode = 'list' | 'calendar'
+
 export default function MovimientosPage() {
   const { selectedMonth } = useMonth()
   const [filters, setFilters] = useState<MovementFilters>({ month: selectedMonth })
   const [search, setSearch] = useState('')
+  const [viewMode, setViewMode] = useState<ViewMode>('list')
   
   // Sync filters with selectedMonth context when it changes, unless we have custom date ranges
   // For simplicity in this version, we just use the selected month
@@ -74,6 +78,24 @@ export default function MovimientosPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {/* Toggle de vista */}
+          <div className="flex bg-surface-subtle p-1 rounded-lg border border-border">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-surface shadow-sm text-foreground' : 'text-foreground-muted hover:text-foreground'}`}
+              aria-label="Vista de lista"
+            >
+              <List size={18} />
+            </button>
+            <button
+              onClick={() => setViewMode('calendar')}
+              className={`p-1.5 rounded-md transition-colors ${viewMode === 'calendar' ? 'bg-surface shadow-sm text-foreground' : 'text-foreground-muted hover:text-foreground'}`}
+              aria-label="Vista de calendario"
+            >
+              <CalendarIcon size={18} />
+            </button>
+          </div>
+
           {/* Oculto en móvil (usar FAB), visible en desktop */}
           <button onClick={handleOpenCreate} className="btn btn-primary desktop-only">
             <Plus size={18} />
@@ -117,6 +139,12 @@ export default function MovimientosPage() {
                <TableSkeleton rows={6} />
             </div>
           </>
+        ) : viewMode === 'calendar' ? (
+          <MovementCalendar 
+            movements={movements || []}
+            onEdit={handleEdit}
+            onDelete={handleDeleteRequest}
+          />
         ) : (
           <>
             {/* Vista Móvil (Tarjetas) */}
@@ -169,3 +197,4 @@ export default function MovimientosPage() {
     </div>
   )
 }
+

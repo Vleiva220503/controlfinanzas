@@ -2,10 +2,9 @@
 import { useState, useMemo } from 'react'
 import { History, Download, Search } from 'lucide-react'
 import { useMovements } from '@/hooks/useMovements'
-import { MovementTable } from '@/components/movements/MovementTable'
-import { MovementCard } from '@/components/movements/MovementCard'
+import { MonthHistoryCard } from '@/components/movements/MonthHistoryCard'
 import { TableSkeleton, MovementCardSkeleton } from '@/components/shared/Skeleton'
-import type { MovementFilters } from '@/types/database'
+import type { Movement, MovementFilters } from '@/types/database'
 import { format } from 'date-fns'
 
 export default function HistorialPage() {
@@ -46,6 +45,30 @@ export default function HistorialPage() {
     link.download = `historial_${format(new Date(), 'yyyy-MM-dd')}.csv`
     link.click()
   }
+
+  // Agrupar movimientos por mes
+  const groupedByMonth = useMemo(() => {
+    if (!movements) return []
+    const map = new Map<string, { income: number; expenses: number; movements: Movement[] }>()
+    
+    for (const m of movements) {
+      if (!map.has(m.month)) map.set(m.month, { income: 0, expenses: 0, movements: [] })
+      const entry = map.get(m.month)!
+      if (m.type === 'ingreso') entry.income += Number(m.amount)
+      else entry.expenses += Number(m.amount)
+      entry.movements.push(m)
+    }
+    
+    return Array.from(map.entries())
+      .sort(([a], [b]) => b.localeCompare(a)) // Sort by month desc (recent first)
+      .map(([month, data]) => ({
+        month,
+        income: data.income,
+        expenses: data.expenses,
+        savings: data.income - data.expenses,
+        movements: data.movements
+      }))
+  }, [movements])
 
   return (
     <div className="flex flex-col gap-6 fade-in max-w-6xl mx-auto pb-12">
@@ -96,23 +119,27 @@ export default function HistorialPage() {
             </div>
             <div className="desktop-only"><TableSkeleton rows={8} /></div>
           </>
-        ) : movements?.length === 0 ? (
+        ) : groupedByMonth.length === 0 ? (
            <div className="card p-8 text-center text-foreground-muted border border-dashed">
              No hay resultados para mostrar
            </div>
         ) : (
-          <>
-            <div className="mobile-only flex flex-col gap-3">
-              {movements?.map(mov => (
-                <MovementCard key={mov.id} movement={mov} />
-              ))}
-            </div>
-            <div className="desktop-only">
-              <MovementTable movements={movements || []} />
-            </div>
-          </>
+          <div className="flex flex-col gap-4">
+            {groupedByMonth.map((group, idx) => (
+              <MonthHistoryCard
+                key={group.month}
+                monthKey={group.month}
+                income={group.income}
+                expenses={group.expenses}
+                savings={group.savings}
+                movements={group.movements}
+                defaultOpen={idx === 0} // Abrir el más reciente por defecto
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>
   )
 }
+

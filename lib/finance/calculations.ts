@@ -116,12 +116,57 @@ export function suggestedMonthlyContribution(
 }
 
 /**
- * Calcula las estadísticas completas del dashboard para un mes dado
+ * Calcula el saldo acumulado arrastrado de todos los meses ANTERIORES al mes objetivo.
+ * Garantiza que el dinero se acumula mes a mes en lugar de reiniciarse a cero.
+ *
+ * @param allMovements - Lista completa de todos los movimientos históricos
+ * @param targetMonth  - Mes objetivo en formato 'YYYY-MM'
+ * @returns Saldo neto de todos los meses previos al targetMonth
+ */
+export function calculateCarryOverBalance(
+  allMovements: Pick<Movement, 'month' | 'type' | 'amount'>[],
+  targetMonth: string
+): number {
+  return allMovements
+    .filter(m => m.month < targetMonth)
+    .reduce((sum, m) => {
+      return sum + (m.type === 'ingreso' ? Number(m.amount) : -Number(m.amount))
+    }, 0)
+}
+
+/**
+ * Calcula el saldo disponible acumulado hasta el mes objetivo (inclusive).
+ * = saldo arrastrado de meses anteriores + ingresos del mes - gastos del mes
+ *
+ * @param allMovements  - Lista completa de todos los movimientos históricos
+ * @param targetMonth   - Mes objetivo en formato 'YYYY-MM'
+ * @returns Saldo disponible acumulado a fin del mes objetivo
+ */
+export function calculateCumulativeBalance(
+  allMovements: Pick<Movement, 'month' | 'type' | 'amount'>[],
+  targetMonth: string
+): number {
+  return allMovements
+    .filter(m => m.month <= targetMonth)
+    .reduce((sum, m) => {
+      return sum + (m.type === 'ingreso' ? Number(m.amount) : -Number(m.amount))
+    }, 0)
+}
+
+/**
+ * Calcula las estadísticas completas del dashboard para un mes dado,
+ * incluyendo saldo acumulado arrastrado de meses anteriores.
+ *
+ * @param currentMonthMovements  - Movimientos del mes seleccionado
+ * @param previousMonthMovements - Movimientos del mes anterior (para variaciones)
+ * @param accountsBalance        - Suma de saldos actuales de todas las cuentas
+ * @param carryOver              - Saldo arrastrado de meses anteriores (calculateCarryOverBalance)
  */
 export function calculateDashboardStats(
   currentMonthMovements: Movement[],
   previousMonthMovements: Movement[],
-  accountsBalance: number
+  accountsBalance: number,
+  carryOver: number = 0
 ): DashboardStats {
   const totalInc = totalIncome(currentMonthMovements)
   const totalExp = totalExpenses(currentMonthMovements)
@@ -133,7 +178,7 @@ export function calculateDashboardStats(
     totalExpenses: totalExp,
     savings: monthlySavings(totalInc, totalExp),
     savingsPercent: savingsPercent(totalInc, totalExp),
-    availableBalance: monthlySavings(totalInc, totalExp),
+    availableBalance: carryOver + totalInc - totalExp,
     totalAccountsBalance: accountsBalance,
     previousMonthIncome: prevInc,
     previousMonthExpenses: prevExp,
@@ -182,6 +227,31 @@ export function groupByMonth(movements: Movement[]): {
       expenses,
       savings: income - expenses,
     }))
+}
+
+/**
+ * Agrupa movimientos por fecha (YYYY-MM-DD).
+ * Útil para el calendario y el desglose diario del historial.
+ *
+ * @returns Mapa de fecha → { income, expenses, movements }
+ */
+export function groupByDay(movements: Movement[]): Map<string, {
+  income: number
+  expenses: number
+  movements: Movement[]
+}> {
+  const map = new Map<string, { income: number; expenses: number; movements: Movement[] }>()
+
+  for (const m of movements) {
+    const date = m.date.substring(0, 10) // 'YYYY-MM-DD'
+    if (!map.has(date)) map.set(date, { income: 0, expenses: 0, movements: [] })
+    const entry = map.get(date)!
+    if (m.type === 'ingreso') entry.income += Number(m.amount)
+    else entry.expenses += Number(m.amount)
+    entry.movements.push(m)
+  }
+
+  return map
 }
 
 /**
