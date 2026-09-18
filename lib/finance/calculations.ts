@@ -204,7 +204,7 @@ export function expensesByCategory(movements: Movement[]): Record<string, number
  * Datos históricos por mes para gráficos de línea/barra
  * Agrupa una lista de movimientos por mes
  */
-export function groupByMonth(movements: Movement[]): {
+export function groupByMonth(movements: Pick<Movement, 'month' | 'type' | 'amount'>[]): {
   month: string
   income: number
   expenses: number

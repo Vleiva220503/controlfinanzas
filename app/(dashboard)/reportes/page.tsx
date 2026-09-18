@@ -6,7 +6,7 @@ import { BalanceLineChart } from '@/components/dashboard/charts/BalanceLineChart
 import { CategoryPieChart } from '@/components/dashboard/charts/CategoryPieChart'
 import type { Movement } from '@/types/database'
 import { groupByMonth } from '@/lib/finance/calculations'
-import { formatCurrency } from '@/lib/finance/formatters'
+import { formatCurrency, formatMonthShort } from '@/lib/finance/formatters'
 import { ChartSkeleton } from '@/components/shared/Skeleton'
 import { useMemo } from 'react'
 
@@ -16,14 +16,22 @@ export default function ReportesPage() {
   const { data: historicalData, isLoading: isLoadingHistorical } = useHistoricalData(12)
 
   const chartData = useMemo(
-    () => (historicalData ? groupByMonth(historicalData as unknown as Movement[]) : []),
+    () => {
+      if (!historicalData) return []
+      return groupByMonth(historicalData).map(d => ({
+        label: formatMonthShort(d.month),
+        income: d.income,
+        expenses: d.expenses,
+        savings: d.savings,
+      }))
+    },
     [historicalData]
   )
 
   const balanceChartData = useMemo(() => {
-    return chartData.reduce<{ month: string; balance: number }[]>((acc, d) => {
+    return chartData.reduce<{ label: string; balance: number }[]>((acc, d) => {
       const lastBalance = acc.length > 0 ? acc[acc.length - 1].balance : 0
-      acc.push({ month: d.month, balance: lastBalance + d.savings })
+      acc.push({ label: d.label, balance: lastBalance + d.savings })
       return acc
     }, [])
   }, [chartData])
