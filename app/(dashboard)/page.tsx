@@ -12,6 +12,7 @@ import { BalanceLineChart } from '@/components/dashboard/charts/BalanceLineChart
 import { IncomeExpenseBarChart } from '@/components/dashboard/charts/IncomeExpenseBarChart'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { KPICardSkeleton, ChartSkeleton } from '@/components/shared/Skeleton'
+import { DogLoader } from '@/components/shared/DogLoader'
 import { Wallet, TrendingUp, TrendingDown, Target } from 'lucide-react'
 import { groupByMonth, groupByDay } from '@/lib/finance/calculations'
 import { formatMonthShort } from '@/lib/finance/formatters'
@@ -100,8 +101,19 @@ export default function DashboardPage() {
   const stats = dashboardData?.stats
   const recentMovements = dashboardData?.recentMovements || []
 
+  // Primera carga: no hay datos en caché y está cargando
+  const isFirstLoad = (isLoadingStats || isLoadingHistorical) && !dashboardData
+
   return (
     <div className="flex flex-col gap-6 fade-in max-w-6xl mx-auto">
+      {/* Overlay de primera carga con mascota */}
+      <DogLoader
+        visible={isFirstLoad}
+        status="loading"
+        message="Cargando tus finanzas..."
+        size="lg"
+        overlay
+      />
 
       {/* ─── KPIs Grid ─── */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">

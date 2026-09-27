@@ -16,7 +16,7 @@ import {
 import { useMovements, useDeleteMovement } from '@/hooks/useMovements'
 import { MovementModal } from '@/components/movements/MovementModal'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
-import { MovementCardSkeleton } from '@/components/shared/Skeleton'
+import { InlineDogLoader } from '@/components/shared/DogLoader'
 import { formatCurrency, formatDate, formatMonth } from '@/lib/finance/formatters'
 import type { Movement } from '@/types/database'
 
@@ -301,11 +301,7 @@ export function CategoryExpensesPanel({
           {/* Movements list */}
           <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem 1rem' }}>
             {isLoading ? (
-              <div className="flex flex-col gap-3">
-                <MovementCardSkeleton />
-                <MovementCardSkeleton />
-                <MovementCardSkeleton />
-              </div>
+              <InlineDogLoader message="Buscando gastos..." />
             ) : sortedMovements.length === 0 ? (
               <div
                 style={{

@@ -10,7 +10,7 @@ import { LayoutGrid, TrendingDown, ChevronRight } from 'lucide-react'
 import { useMonth } from '@/components/providers/MonthProvider'
 import { useMovements } from '@/hooks/useMovements'
 import { CategoryExpensesPanel } from '@/components/categories/CategoryExpensesPanel'
-import { ChartSkeleton } from '@/components/shared/Skeleton'
+import { DogLoader } from '@/components/shared/DogLoader'
 import { formatCurrency, formatMonth } from '@/lib/finance/formatters'
 import type { Category } from '@/types/database'
 
@@ -129,12 +129,13 @@ export default function GastosPorCategoriaPage() {
 
       {/* ── Content ─────────────────────────────────────────────── */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="card p-5">
-              <ChartSkeleton height={100} />
-            </div>
-          ))}
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem 0' }}>
+          <DogLoader
+            visible
+            status="loading"
+            message="Cargando categorías..."
+            size="md"
+          />
         </div>
       ) : categories.length === 0 ? (
         <EmptyState month={selectedMonth} />

@@ -3,7 +3,7 @@
 // Full-screen bottom sheet on mobile, centered dialog on desktop
 // Handles both income and expense creation/editing
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { X, TrendingUp, TrendingDown } from 'lucide-react'
@@ -14,6 +14,7 @@ import { useCategories } from '@/hooks/useCategories'
 import { movementSchema, type MovementFormValues } from '@/lib/finance/validators'
 import { cn } from '@/lib/utils'
 import type { Movement } from '@/types/database'
+import { DogLoader } from '@/components/shared/DogLoader'
 
 interface MovementModalProps {
   defaultType: 'ingreso' | 'gasto'
@@ -29,6 +30,9 @@ export function MovementModal({ defaultType, onClose, editMovement }: MovementMo
   const { data: accounts = [] } = useAccounts()
   const { data: incomeCategories = [] } = useCategories('ingreso')
   const { data: expenseCategories = [] } = useCategories('gasto')
+
+  // Estado de éxito temporal para la animación de la mascota
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success'>('idle')
 
   const {
     register,
@@ -72,12 +76,18 @@ export function MovementModal({ defaultType, onClose, editMovement }: MovementMo
   }, [onClose])
 
   async function onSubmit(data: MovementFormValues) {
-    if (editMovement) {
-      await updateMovement.mutateAsync({ id: editMovement.id, values: data })
-    } else {
-      await createMovement.mutateAsync(data)
+    setSaveStatus('saving')
+    try {
+      if (editMovement) {
+        await updateMovement.mutateAsync({ id: editMovement.id, values: data })
+      } else {
+        await createMovement.mutateAsync(data)
+      }
+      setSaveStatus('success')
+      // onClose se llama en onDone del DogLoader tras la anim de éxito
+    } catch {
+      setSaveStatus('idle')
     }
-    onClose()
   }
 
   const accentColor = isIncome ? 'var(--positive)' : 'var(--negative)'
@@ -85,6 +95,16 @@ export function MovementModal({ defaultType, onClose, editMovement }: MovementMo
 
   return (
     <>
+      {/* Mascota de carga al guardar */}
+      <DogLoader
+        visible={saveStatus === 'saving' || saveStatus === 'success'}
+        status={saveStatus === 'success' ? 'success' : 'loading'}
+        message={saveStatus === 'success' ? '¡Guardado!' : (editMovement ? 'Actualizando...' : 'Guardando...')}
+        size="md"
+        overlay
+        onDone={onClose}
+      />
+
       {/* Backdrop — semitransparent, click to close */}
       <div
         aria-hidden
