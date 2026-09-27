@@ -19,6 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
   TrendingDown,
+  LayoutGrid,
   LogOut,
   Sun,
   Moon,
@@ -29,18 +30,19 @@ import { createClient } from '@/lib/supabase/client'
 import { clearQueryCache } from '@/components/providers/QueryProvider'
 
 const navItems = [
-  { href: '/',               icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/movimientos',    icon: ArrowLeftRight,  label: 'Movimientos' },
-  { href: '/ingresos',       icon: TrendingUp,      label: 'Ingresos' },
-  { href: '/gastos',         icon: TrendingDown,    label: 'Gastos' },
-  { href: '/transferencias', icon: Wallet,          label: 'Transferencias' },
-  { href: '/presupuestos',   icon: PieChart,        label: 'Presupuestos' },
-  { href: '/ahorros',        icon: Target,          label: 'Ahorros' },
-  { href: '/cuentas',        icon: Wallet,          label: 'Cuentas' },
-  { href: '/recurrentes',    icon: RefreshCw,       label: 'Recurrentes' },
-  { href: '/reportes',       icon: PieChart,        label: 'Reportes' },
-  { href: '/historial',      icon: History,         label: 'Historial' },
-  { href: '/configuracion',  icon: Settings,        label: 'Configuración' },
+  { href: '/',                        icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/movimientos',             icon: ArrowLeftRight,  label: 'Movimientos' },
+  { href: '/ingresos',                icon: TrendingUp,      label: 'Ingresos' },
+  { href: '/gastos',                  icon: TrendingDown,    label: 'Gastos' },
+  { href: '/gastos-por-categoria',    icon: LayoutGrid,      label: 'Por Categoría' },
+  { href: '/transferencias',          icon: Wallet,          label: 'Transferencias' },
+  { href: '/presupuestos',            icon: PieChart,        label: 'Presupuestos' },
+  { href: '/ahorros',                 icon: Target,          label: 'Ahorros' },
+  { href: '/cuentas',                 icon: Wallet,          label: 'Cuentas' },
+  { href: '/recurrentes',             icon: RefreshCw,       label: 'Recurrentes' },
+  { href: '/reportes',                icon: PieChart,        label: 'Reportes' },
+  { href: '/historial',               icon: History,         label: 'Historial' },
+  { href: '/configuracion',           icon: Settings,        label: 'Configuración' },
 ]
 
 export function Sidebar() {
